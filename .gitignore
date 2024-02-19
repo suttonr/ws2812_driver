@@ -1,4 +1,4 @@
-*
+*.*
 # Ignore everything except these extenstions
 !*.gitignore
 !*.vhd
@@ -8,4 +8,5 @@
 !*.ldf
 !*.lpf
 !*.sty
-
+!doc/img/**
+!README.md
