@@ -4,10 +4,17 @@ USE ieee.std_logic_1164.ALL;
 ENTITY top IS
 	PORT(
 		sclk 		:IN std_logic;
-		button0     :IN std_logic;
-		led0,led1	:INOUT std_logic;
+		sclk_enable :OUT std_logic;
+		-- WS2812 PORTS
 		serial_out  :OUT std_logic;
-		sclk_enable :OUT std_logic
+		-- SPI
+	    MISO_SLAVE  : out  std_logic;
+        MOSI_SLAVE  : in   std_logic;						
+        CSn_SLAVE   : in   std_logic;						
+        SCLK_SLAVE  : in   std_logic;
+		-- Debug
+		button0     :IN std_logic;
+		led0,led1,led2,led3,led4,led5,led6,led7	:INOUT std_logic
 	);
 END top;
 
@@ -38,7 +45,30 @@ COMPONENT load_mem
 		clk : in std_logic;
 		WrData : out std_logic_vector(23 downto 0);
 		WrAddr : out std_logic_vector(8 downto 0);
-		WrEnable : out std_logic
+		WrEnable : out std_logic;
+		SPI_DATA_OUT  : in  std_logic_vector(7 downto 0);
+        SPI_RX_RDY    : in  std_logic;
+        SPI_RX_ERR    : in  std_logic;
+		SPI_CS        : out std_logic;
+		debug		  : inout std_logic
+	);
+END COMPONENT;
+COMPONENT spi_slave
+	port (
+        CSn       : in  std_logic;
+        DATA_IN   : in  std_logic_vector(7 downto 0);
+        WR_RD     : in  std_logic;
+        DATA_OUT  : out  std_logic_vector(7 downto 0);	
+        TX_RDY     : out  std_logic;						
+        RX_RDY     : out  std_logic;
+        TX_ERR      : out std_logic;						
+        RX_ERR      : out std_logic;						
+        CLK_I     : in std_logic;						
+        RST_I     : in  std_logic;
+        MISO_SLAVE  : out std_logic;
+        MOSI_SLAVE  : in  std_logic;						
+        CSn_SLAVE   : in std_logic;						
+        SCLK_SLAVE   : in std_logic          			          					          				
 	);
 END COMPONENT;
 COMPONENT frame_buffer_0
@@ -50,6 +80,7 @@ COMPONENT frame_buffer_0
         WrClockEn: in std_logic; Q : out std_logic_vector(23 downto 0)
     );
  END COMPONENT;
+    -- Frame Buffer
     signal WrAddress : std_logic_vector(8 downto 0) := (others => '0');
     signal RdAddress : std_logic_vector(8 downto 0) := (others => '0');
     signal Data : std_logic_vector(23 downto 0) := (others => '0');
@@ -60,7 +91,30 @@ COMPONENT frame_buffer_0
     -- signal WrClock: std_logic := '0';
     signal WrClockEn: std_logic := '0';
     signal Q : std_logic_vector(23 downto 0);
+	
+	-- SPI
+    signal CSn         :  std_logic;
+    signal DATA_IN     :  std_logic_vector(7 downto 0);
+    signal WR_RD       :  std_logic;
+    signal DATA_OUT    :  std_logic_vector(7 downto 0);	
+    signal TX_RDY      :  std_logic;						
+    signal RX_RDY      :  std_logic;
+    signal TX_ERR      :  std_logic;						
+    signal RX_ERR      :  std_logic;						
+    -- signal CLK_I       :   std_logic;						
+    signal RST_I       :   std_logic;
+    
+	signal nButton     :   std_logic;
+
+
 BEGIN
+spi_port : spi_slave
+	PORT MAP ( 
+		CSn => CSn, DATA_IN => DATA_IN, WR_RD => WR_RD, DATA_OUT => DATA_OUT,
+		TX_RDY => TX_RDY, RX_RDY => RX_RDY, TX_ERR => TX_ERR, RX_ERR => RX_ERR,
+		MISO_SLAVE => MISO_SLAVE, MOSI_SLAVE => MOSI_SLAVE, CSn_SLAVE => CSn_SLAVE,
+		SCLK_SLAVE => SCLK_SLAVE, CLK_I => sclk, RST_I => RST_I
+	);
 framebuffer0 : frame_buffer_0
     PORT MAP (WrAddress => WrAddress, RdAddress => RdAddress, Data => Data, 
 		WE => WE, RdClock => sclk, RdClockEn => RdClockEn, Reset => Reset, 
@@ -72,12 +126,19 @@ WS2812_t : WS2812
 	);
 button_test_t : button_test PORT MAP ( clk => sclk, button => button0, led => led1);
 load_mem_t : load_mem 
-	PORT MAP (clk => sclk, WrData => Data, WrAddr => WrAddress, WrEnable => WE);
+	PORT MAP (clk => sclk, WrData => Data, WrAddr => WrAddress, WrEnable => WE,
+		SPI_DATA_OUT => DATA_OUT, SPI_RX_RDY => RX_RDY, SPI_RX_ERR => RX_ERR, SPI_CS => CSn,
+		debug => led0
+	);
 PROCESS(sclk)
 BEGIN
 	sclk_enable <= '1';
 	WrClockEn <= '1';
 	Reset <= '0';
 	RdClockEn <= '1';
+	WR_RD <= '1';
+	RST_I <= '0';
+	nButton <= not button0;
+	
 END PROCESS;
 END;

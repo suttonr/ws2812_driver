@@ -10,18 +10,26 @@ entity load_mem is
 		clk : in std_logic;
 		WrData : out std_logic_vector(23 downto 0);
 		WrAddr : out std_logic_vector(8 downto 0);
-		WrEnable : out std_logic
+		WrEnable : out std_logic;
+		SPI_DATA_OUT  : in  std_logic_vector(7 downto 0);
+        SPI_RX_RDY    : in  std_logic;
+        SPI_RX_ERR    : in  std_logic;
+		SPI_CS        : out std_logic;
+		debug		  : inout std_logic
 	);
 end entity load_mem;
 
 architecture arch of load_mem is
 	constant WRD : integer := 5;
+	constant SPI_TIMEOUT : integer := 60;
 	type pixel_array is array(0 to 9) of std_logic_vector(23 downto 0);
 	type state_machine is (load, wr, reset);
 begin
 	process
 		variable state : state_machine := load;
 		variable delay_counter : integer := 0;
+		variable spi_byte_counter : integer := 0;
+		variable spi_byte_timeout : integer := SPI_TIMEOUT;
 		variable index : integer := 0;		
 		variable p_array : pixel_array := (x"FF0000", -- LED 0, Green Red Blue
 											x"00FF00", 
@@ -37,11 +45,36 @@ begin
 	begin
 		wait until rising_edge(clk);
 		case state is
+			-- [Addr][G][B][R]
 			when load =>
-				WrData <= p_array(index);
-				WrAddr  <= std_logic_vector(to_unsigned(index, WrAddr'length));
 				delay_counter := WRD;
-				state  := wr;
+				SPI_CS <= '0';
+				if index < pixel_array'length-1 then
+					WrData <= p_array(index);
+					WrAddr <= std_logic_vector(to_unsigned(index, WrAddr'length));
+					SPI_CS <= '1';
+					state  := wr;
+				elsif ((SPI_RX_RDY = '1') and ( spi_byte_counter < 1 )) then
+					WrAddr(7 downto 0) <= SPI_DATA_OUT;
+					SPI_CS <= '1';
+					spi_byte_counter := spi_byte_counter + 1;
+					spi_byte_timeout := SPI_TIMEOUT;
+				elsif (SPI_RX_RDY = '1') then
+					WrData(23-((spi_byte_counter-1)*8) downto  16-((spi_byte_counter-1)*8) ) <= SPI_DATA_OUT;
+					SPI_CS <= '1';
+					spi_byte_counter := spi_byte_counter + 1;
+					spi_byte_timeout := SPI_TIMEOUT;
+				elsif ((spi_byte_counter > 0) and (spi_byte_timeout > 0)) then
+					spi_byte_timeout := spi_byte_timeout - 1;
+				elsif (spi_byte_counter > 0) then
+					spi_byte_counter := 0;
+					spi_byte_timeout := SPI_TIMEOUT;
+				end if;
+				
+				if spi_byte_counter > 3 then
+					debug <= not debug;
+					state  := wr;
+				end if;
 			when wr =>
 				WrEnable <= '1';
 				if (delay_counter > 0) then
@@ -51,10 +84,14 @@ begin
 					state := reset;
 				end if;
 			when reset =>
+				WrData <= (others => '0');
+				WrAddr <= (others => '0');
+				spi_byte_counter := 0;
+				spi_byte_timeout := SPI_TIMEOUT;
 				if index < pixel_array'length-1 then
 					index := index + 1;
-					state := load;
 				end if;
+				state := load;
 		end case;
 	end process;
 end arch;
