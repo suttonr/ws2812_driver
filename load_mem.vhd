@@ -10,7 +10,7 @@ entity load_mem is
 		clk : in std_logic;
 		WrData : out std_logic_vector(23 downto 0);
 		WrAddr : out std_logic_vector(8 downto 0);
-		WrEnable : out std_logic;
+		WrEnable : out std_logic_vector(8 downto 0);
 		SPI_DATA_OUT  : in  std_logic_vector(7 downto 0);
         SPI_RX_RDY    : in  std_logic;
         SPI_RX_ERR    : in  std_logic;
@@ -26,6 +26,7 @@ architecture arch of load_mem is
 	type state_machine is (load, wr, reset);
 begin
 	process
+		variable fb : integer := 0;
 		variable state : state_machine := load;
 		variable delay_counter : integer := 0;
 		variable spi_byte_counter : integer := 0;
@@ -55,12 +56,18 @@ begin
 					SPI_CS <= '1';
 					state  := wr;
 				elsif ((SPI_RX_RDY = '1') and ( spi_byte_counter < 1 )) then
+					WrAddr(8) <= SPI_DATA_OUT(0);
+					fb := to_integer(signed(SPI_DATA_OUT(7 downto 1)));
+					SPI_CS <= '1';
+					spi_byte_counter := spi_byte_counter + 1;
+					spi_byte_timeout := SPI_TIMEOUT;
+				elsif ((SPI_RX_RDY = '1') and ( spi_byte_counter < 2 )) then
 					WrAddr(7 downto 0) <= SPI_DATA_OUT;
 					SPI_CS <= '1';
 					spi_byte_counter := spi_byte_counter + 1;
 					spi_byte_timeout := SPI_TIMEOUT;
 				elsif (SPI_RX_RDY = '1') then
-					WrData(23-((spi_byte_counter-1)*8) downto  16-((spi_byte_counter-1)*8) ) <= SPI_DATA_OUT;
+					WrData(23-((spi_byte_counter-2)*8) downto  16-((spi_byte_counter-2)*8) ) <= SPI_DATA_OUT;
 					SPI_CS <= '1';
 					spi_byte_counter := spi_byte_counter + 1;
 					spi_byte_timeout := SPI_TIMEOUT;
@@ -71,16 +78,16 @@ begin
 					spi_byte_timeout := SPI_TIMEOUT;
 				end if;
 				
-				if spi_byte_counter > 3 then
+				if spi_byte_counter > 4 then
 					debug <= not debug;
 					state  := wr;
 				end if;
 			when wr =>
-				WrEnable <= '1';
+				WrEnable(fb) <= '1';
 				if (delay_counter > 0) then
 					delay_counter := delay_counter - 1;
 				else
-					WrEnable <= '0';
+					WrEnable(fb) <= '0';
 					state := reset;
 				end if;
 			when reset =>

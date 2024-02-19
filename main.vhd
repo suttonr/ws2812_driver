@@ -7,7 +7,10 @@ ENTITY top IS
 		sclk_enable :OUT std_logic;
 		-- WS2812 PORTS
 		serial_out  :OUT std_logic;
-		-- SPI
+		serial1_out  :OUT std_logic;
+		serial2_out  :OUT std_logic;
+
+-- SPI
 	    MISO_SLAVE  : out  std_logic;
         MOSI_SLAVE  : in   std_logic;						
         CSn_SLAVE   : in   std_logic;						
@@ -22,7 +25,7 @@ ARCHITECTURE arch OF top IS
 COMPONENT WS2812
 	generic (
 		clock_frequency : integer := 48_000_000; -- Hertz
-		max_address : std_logic_vector(8 downto 0) := b"011111111"
+		max_address : std_logic_vector(8 downto 0) := b"111111111"
 	);
 	port (
 		clk : in std_logic;
@@ -45,7 +48,7 @@ COMPONENT load_mem
 		clk : in std_logic;
 		WrData : out std_logic_vector(23 downto 0);
 		WrAddr : out std_logic_vector(8 downto 0);
-		WrEnable : out std_logic;
+		WrEnable : out std_logic_vector(8 downto 0);
 		SPI_DATA_OUT  : in  std_logic_vector(7 downto 0);
         SPI_RX_RDY    : in  std_logic;
         SPI_RX_ERR    : in  std_logic;
@@ -82,15 +85,19 @@ COMPONENT frame_buffer_0
  END COMPONENT;
     -- Frame Buffer
     signal WrAddress : std_logic_vector(8 downto 0) := (others => '0');
-    signal RdAddress : std_logic_vector(8 downto 0) := (others => '0');
+    signal RdAddress0 : std_logic_vector(8 downto 0) := (others => '0');
+	signal RdAddress1 : std_logic_vector(8 downto 0) := (others => '0');
+	signal RdAddress2 : std_logic_vector(8 downto 0) := (others => '0');
     signal Data : std_logic_vector(23 downto 0) := (others => '0');
-    signal WE: std_logic := '0';
+    signal WE: std_logic_vector(8 downto 0);
     -- signal RdClock: std_logic := '0';
     signal RdClockEn: std_logic := '0';
     signal Reset: std_logic := '0';
     -- signal WrClock: std_logic := '0';
     signal WrClockEn: std_logic := '0';
-    signal Q : std_logic_vector(23 downto 0);
+    signal Q0 : std_logic_vector(23 downto 0);
+	signal Q1 : std_logic_vector(23 downto 0);
+	signal Q2 : std_logic_vector(23 downto 0);
 	
 	-- SPI
     signal CSn         :  std_logic;
@@ -116,13 +123,31 @@ spi_port : spi_slave
 		SCLK_SLAVE => SCLK_SLAVE, CLK_I => sclk, RST_I => RST_I
 	);
 framebuffer0 : frame_buffer_0
-    PORT MAP (WrAddress => WrAddress, RdAddress => RdAddress, Data => Data, 
-		WE => WE, RdClock => sclk, RdClockEn => RdClockEn, Reset => Reset, 
-		WrClock => sclk, WrClockEn => WrClockEn, Q => Q
+    PORT MAP (WrAddress => WrAddress, RdAddress => RdAddress0, Data => Data, 
+		WE => WE(0), RdClock => sclk, RdClockEn => RdClockEn, Reset => Reset, 
+		WrClock => sclk, WrClockEn => WrClockEn, Q => Q0
 	);
-WS2812_t : WS2812 
-	PORT MAP (clk => sclk, PixelIn => Q, PixelAddress => RdAddress,
+framebuffer1 : frame_buffer_0
+    PORT MAP (WrAddress => WrAddress, RdAddress => RdAddress1, Data => Data, 
+		WE => WE(1), RdClock => sclk, RdClockEn => RdClockEn, Reset => Reset, 
+		WrClock => sclk, WrClockEn => WrClockEn, Q => Q1
+	);
+framebuffer2 : frame_buffer_0
+    PORT MAP (WrAddress => WrAddress, RdAddress => RdAddress2, Data => Data, 
+		WE => WE(2), RdClock => sclk, RdClockEn => RdClockEn, Reset => Reset, 
+		WrClock => sclk, WrClockEn => WrClockEn, Q => Q2
+	);
+WS2812_0 : WS2812 
+	PORT MAP (clk => sclk, PixelIn => Q0, PixelAddress => RdAddress0,
 		serial => serial_out, load_delay => led0, enable => button0
+	);
+WS2812_1 : WS2812 
+	PORT MAP (clk => sclk, PixelIn => Q1, PixelAddress => RdAddress1,
+		serial => serial1_out, load_delay => led0, enable => button0
+	);
+WS2812_2 : WS2812 
+	PORT MAP (clk => sclk, PixelIn => Q2, PixelAddress => RdAddress2,
+		serial => serial2_out, load_delay => led0, enable => button0
 	);
 button_test_t : button_test PORT MAP ( clk => sclk, button => button0, led => led1);
 load_mem_t : load_mem 

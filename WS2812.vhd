@@ -6,7 +6,7 @@ use ieee.std_logic_unsigned.all;
 entity WS2812 is
 	generic (
 		clock_frequency : integer := 48_000_000; -- Hertz
-		max_address : std_logic_vector(8 downto 0) := b"011111111"
+		max_address : std_logic_vector(8 downto 0) := b"111111111"
 		
 	);
 	port (
