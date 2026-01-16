@@ -1,0 +1,115 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity load_mem is
+	generic (
+		clock_frequency : integer := 48_000_000 -- Hertz
+	);
+	port (
+		clk : in std_logic;
+		WrData : out std_logic_vector(23 downto 0);
+		WrAddr : out std_logic_vector(8 downto 0);
+		WrEnable : out std_logic_vector(23 downto 0);
+		SPI_DATA_OUT  : in  std_logic_vector(7 downto 0);
+        SPI_RX_RDY    : in  std_logic;
+        SPI_RX_ERR    : in  std_logic;
+		SPI_CS        : out std_logic;
+		SPI_RST       : in  std_logic;
+		debug		  : inout std_logic
+	);
+end entity load_mem;
+
+architecture arch of load_mem is
+	constant WRD : integer := 5;
+	constant SPI_TIMEOUT : integer := 4800;
+	type pixel_array is array(0 to 20) of std_logic_vector(23 downto 0);
+	type state_machine is (load, wr, reset);
+begin
+	process
+		variable fb : integer := 0;
+		variable state : state_machine := load;
+		variable delay_counter : integer := 0;
+		variable spi_byte_counter : integer := 0;
+		variable spi_byte_timeout : integer := SPI_TIMEOUT;
+		variable index : integer := 0;		
+		-- STARTUP PATTERN
+		variable p_array : pixel_array := (x"FF0000", x"00FF00", x"0000FF", -- Port1
+											x"FF0000", x"00FF00", x"0000FF", -- Port2
+											x"FF0000", x"00FF00", x"0000FF", -- Port3
+											x"FF0000", x"00FF00", x"0000FF", -- Port4
+											x"FF0000", x"00FF00", x"0000FF", -- Port5
+											x"FF0000", x"00FF00", x"0000FF", -- Port6
+											x"FF0000", x"00FF00", x"0000FF"  -- Port7
+											);
+	begin
+		wait until rising_edge(clk);
+		case state is
+			-- [Addr:16][G:8][B:8][R:8]
+			-- ADDR: [PORT 15:9][PIXEL 8:0]
+			when load =>
+				delay_counter := WRD;
+				SPI_CS <= '0';
+				if index < pixel_array'length-1 then
+					WrData <= p_array(index);
+					fb := index;
+					WrAddr <= std_logic_vector(to_unsigned(index, WrAddr'length));
+					SPI_CS <= '1';
+					state  := wr;
+				elsif ((SPI_RX_RDY = '1') and ( spi_byte_counter < 1 )) then
+					if SPI_DATA_OUT = x"0F" then
+					    spi_byte_counter := spi_byte_counter + 1;
+					    spi_byte_timeout := SPI_TIMEOUT;
+					end if;
+					SPI_CS <= '1';
+				elsif ((SPI_RX_RDY = '1') and ( spi_byte_counter < 2 )) then
+					WrAddr(8) <= SPI_DATA_OUT(0);
+					fb := to_integer(unsigned(SPI_DATA_OUT(7 downto 1)));
+					SPI_CS <= '1';
+					spi_byte_counter := spi_byte_counter + 1;
+					spi_byte_timeout := SPI_TIMEOUT;
+				elsif ((SPI_RX_RDY = '1') and ( spi_byte_counter < 3 )) then
+					WrAddr(7 downto 0) <= SPI_DATA_OUT;
+					SPI_CS <= '1';
+					spi_byte_counter := spi_byte_counter + 1;
+					spi_byte_timeout := SPI_TIMEOUT;
+				elsif (SPI_RX_RDY = '1') then
+					WrData(23-((spi_byte_counter-3)*8) downto  16-((spi_byte_counter-3)*8) ) <= SPI_DATA_OUT;
+					SPI_CS <= '1';
+					spi_byte_counter := spi_byte_counter + 1;
+					spi_byte_timeout := SPI_TIMEOUT;
+				elsif ((spi_byte_counter > 0) and (spi_byte_timeout > 0)) then
+					spi_byte_timeout := spi_byte_timeout - 1;
+				elsif (spi_byte_counter > 0) then
+					spi_byte_counter := 0;
+					spi_byte_timeout := SPI_TIMEOUT;
+				end if;
+				
+				-- if SPI_RST = '1' then
+				--    state := reset;
+				if spi_byte_counter > 5 then
+					debug <= not debug;
+					state  := wr;
+				end if;
+			when wr =>
+				WrEnable <= (others => '0');
+				WrEnable(fb) <= '1';
+				if (delay_counter > 0) then
+					delay_counter := delay_counter - 1;
+				else
+					WrEnable(fb) <= '0';
+					state := reset;
+				end if;
+			when reset =>
+				WrData <= (others => '0');
+				WrAddr <= (others => '0');
+				WrEnable <= (others => '0');
+				spi_byte_counter := 0;
+				spi_byte_timeout := SPI_TIMEOUT;
+				if index < pixel_array'length-1 then
+					index := index + 1;
+				end if;
+				state := load;
+		end case;
+	end process;
+end arch;

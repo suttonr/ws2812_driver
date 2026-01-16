@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DiamondModule name="frame_buffer_0" module="frame_buffer_0" VendorName="Lattice Semiconductor Corporation" generator="IPexpress" date="2024 02 12 00:14:40.956" version="6.5" type="Module" synthesis="lse" source_format="VHDL">
+  <Package>
+		<File name="" type="" modified="2024 02 12 00:14:40.813"/>
+		<File name="frame_buffer_0.lpc" type="lpc" modified="2024 02 12 00:14:27.823"/>
+		<File name="frame_buffer_0.vhd" type="top_level_vhdl" modified="2024 02 12 00:14:28.018"/>
+		<File name="frame_buffer_0_tmpl.vhd" type="template_vhdl" modified="2024 02 12 00:14:28.024"/>
+		<File name="tb_frame_buffer_0_tmpl.vhd" type="testbench_vhdl" modified="2024 02 12 00:14:28.032"/>
+  </Package>
+</DiamondModule>

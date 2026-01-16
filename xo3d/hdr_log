@@ -1,0 +1,12 @@
+synthesis:  version Diamond (64-bit) 3.13.0.56.2
+
+Copyright (c) 1991-1994 by NeoCAD Inc. All rights reserved.
+Copyright (c) 1995 AT&T Corp.   All rights reserved.
+Copyright (c) 1995-2001 Lucent Technologies Inc.  All rights reserved.
+Copyright (c) 2001 Agere Systems   All rights reserved.
+Copyright (c) 2002-2023 Lattice Semiconductor Corporation,  All rights reserved.
+Thu Jan 15 23:19:48 2026
+
+
+Command Line:  synthesis -f ws2812_driver_xo3d_lattice.synproj -gui -msgset Z:/shared_git/ws2812_driver/promote.xml 
+

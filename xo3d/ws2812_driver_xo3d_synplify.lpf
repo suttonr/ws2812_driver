@@ -1,0 +1,26 @@
+#
+# Logical Preferences generated for Lattice by Synplify map202303lat, Build 132R.
+#
+
+# Period Constraints 
+#FREQUENCY PORT "sclk" 200.0 MHz;
+#FREQUENCY PORT "SCLK_SLAVE" 200.0 MHz;
+
+
+# Output Constraints 
+
+# Input Constraints 
+
+# Point-to-point Delay Constraints 
+
+
+
+# Block Path Constraints 
+#BLOCK PATH FROM CLKNET "SCLK_SLAVE_c" TO CLKNET "sclk_c";
+#BLOCK PATH FROM CLKNET "sclk_c" TO CLKNET "SCLK_SLAVE_c";
+#BLOCK PATH FROM CLKNET "SCLK_SLAVE_c" TO CLKNET "sclk_c";
+#BLOCK PATH FROM CLKNET "sclk_c" TO CLKNET "SCLK_SLAVE_c";
+
+BLOCK ASYNCPATHS;
+
+# End of generated Logical Preferences.

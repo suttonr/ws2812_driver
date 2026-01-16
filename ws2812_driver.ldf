@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<BaliProject version="3.2" title="ws2812_driver" device="LCMXO2-7000HE-4TG144C" default_implementation="impl1">
+<BaliProject version="3.2" title="ws2812_driver" device="LCMXO3D-9400HC-5SG72C" default_implementation="xo3d">
     <Options/>
     <Implementation title="impl1" dir="impl1" description="impl1" synthesis="lse" default_strategy="Strategy1">
-        <Options/>
+        <Options def_top="top"/>
         <Source name="main.vhd" type="VHDL" type_short="VHDL">
-            <Options top_module="WS2812"/>
+            <Options top_module="top"/>
         </Source>
         <Source name="testbench.vhd" type="VHDL" type_short="VHDL" syn_sim="SimOnly">
+            <Options/>
+        </Source>
+        <Source name="button_test.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="WS2812.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="frame_buffer_0.ipx" type="IPX_Module" type_short="IPX">
+            <Options/>
+        </Source>
+        <Source name="load_mem.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="testbench_load_mem.vhd" type="VHDL" type_short="VHDL" syn_sim="SimOnly">
+            <Options/>
+        </Source>
+        <Source name="testbench_top.vhd" type="VHDL" type_short="VHDL" syn_sim="SimOnly">
+            <Options/>
+        </Source>
+        <Source name="simple_spi.vhd" type="VHDL" type_short="VHDL">
             <Options/>
         </Source>
         <Source name="impl1/impl1.xcf" type="Programming Project File" type_short="Programming">
@@ -16,6 +37,45 @@
             <Options/>
         </Source>
         <Source name="ws2812_driver.lpf" type="Logic Preference" type_short="LPF">
+            <Options/>
+        </Source>
+    </Implementation>
+    <Implementation title="xo3d" dir="xo3d" description="xo3d" synthesis="lse" default_strategy="Strategy1">
+        <Options def_top="button_test" top="top"/>
+        <Source name="xo3d/source/main.vhd" type="VHDL" type_short="VHDL">
+            <Options top_module="top"/>
+        </Source>
+        <Source name="xo3d/source/testbench.vhd" type="VHDL" type_short="VHDL" syn_sim="SimOnly">
+            <Options/>
+        </Source>
+        <Source name="xo3d/source/button_test.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="xo3d/source/WS2812.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="xo3d/source/frame_buffer_0.ipx" type="IPX_Module" type_short="IPX">
+            <Options/>
+        </Source>
+        <Source name="xo3d/source/load_mem.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="xo3d/source/testbench_load_mem.vhd" type="VHDL" type_short="VHDL" syn_sim="SimOnly">
+            <Options/>
+        </Source>
+        <Source name="xo3d/source/testbench_top.vhd" type="VHDL" type_short="VHDL" syn_sim="SimOnly">
+            <Options/>
+        </Source>
+        <Source name="xo3d/source/simple_spi.vhd" type="VHDL" type_short="VHDL">
+            <Options/>
+        </Source>
+        <Source name="xo3d/impl1.xcf" type="Programming Project File" type_short="Programming">
+            <Options/>
+        </Source>
+        <Source name="xo3d/source/simulation.spf" type="Simulation Project File" type_short="SPF">
+            <Options/>
+        </Source>
+        <Source name="xo3d/source/ws2812_driver.lpf" type="Logic Preference" type_short="LPF">
             <Options/>
         </Source>
     </Implementation>

@@ -1,0 +1,439 @@
+m255
+K4
+z2
+!s11e vcom 2023.3 2023.07, Jul 18 2023
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/Users/ryanm/Documents/Diamond/ws2812_driver/simulation
+Ebutton_test
+Z1 w1707700095
+Z2 DPx4 ieee 11 numeric_std 0 22 F8@]:i<mFK7<TjIzKcTGi0
+Z3 DPx3 std 6 textio 0 22 LS[?81n5ZHWBI9JkBZTV<2
+Z4 DPx4 ieee 14 std_logic_1164 0 22 6<US`=mgl_dFdCEFF7J=m1
+!i122 7
+R0
+Z5 8C:/Users/ryanm/Documents/Diamond/ws2812_driver/button_test.vhd
+Z6 FC:/Users/ryanm/Documents/Diamond/ws2812_driver/button_test.vhd
+l0
+L5 1
+Veez^K`;T1oo1joDS7Rb7e1
+!s100 fF<b>M7iicf^]JfomFXQm3
+Z7 OT;C;2023.3;77
+32
+Z8 !s110 1708292574
+!i10b 1
+Z9 !s108 1708292574.000000
+Z10 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/ryanm/Documents/Diamond/ws2812_driver/button_test.vhd|
+Z11 !s107 C:/Users/ryanm/Documents/Diamond/ws2812_driver/button_test.vhd|
+!i113 1
+Z12 o-work work -2002 -explicit -O0
+Z13 tExplicit 1 CvgOpt 0
+Aarch
+R2
+R3
+R4
+DEx4 work 11 button_test 0 22 eez^K`;T1oo1joDS7Rb7e1
+!i122 7
+l17
+L16 8
+V;e<=<@1l9[RdTI_4^J8L[2
+!s100 I3WGO6YbEb^_ZU^NN=gTc0
+R7
+32
+R8
+!i10b 1
+R9
+R10
+R11
+!i113 1
+R12
+R13
+Eexample_tb
+w1708210212
+R2
+R3
+R4
+!i122 3
+R0
+8C:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench.vhd
+FC:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench.vhd
+l0
+L7 1
+VnCj;7f1L89jS43NWdb3g61
+!s100 E6D_a2eNYL=F6m3_9aX5T2
+R7
+32
+Z14 !s110 1708292573
+!i10b 1
+Z15 !s108 1708292573.000000
+!s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench.vhd|
+!s107 C:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench.vhd|
+!i113 1
+R12
+R13
+Eframe_buffer_0
+Z16 w1707714868
+Z17 DPx4 ieee 15 std_logic_arith 0 22 B[jVX6I8iRX2o6WYW0BB>3
+Z18 DPx7 machxo2 10 components 0 22 JRCBRXV?6fnbU6LQRSMDW2
+R3
+R4
+!i122 8
+R0
+Z19 8C:/Users/ryanm/Documents/Diamond/ws2812_driver/frame_buffer_0.vhd
+Z20 FC:/Users/ryanm/Documents/Diamond/ws2812_driver/frame_buffer_0.vhd
+l0
+L14 1
+VNJaZH6eM;zl?gn3MNYh;I1
+!s100 EXD1I5cXknPC68GTM]Ai`1
+R7
+32
+Z21 !s110 1708292575
+!i10b 1
+!i113 1
+R12
+R13
+Astructure
+R17
+R18
+R3
+R4
+Z22 DEx4 work 14 frame_buffer_0 0 22 NJaZH6eM;zl?gn3MNYh;I1
+!i122 8
+l105
+L28 205
+V;nBkHj2C?1?7[MblA7GNf3
+!s100 ifM[=iU2Ii[0HFmV5Dg4Z3
+R7
+32
+R21
+!i10b 1
+!i113 1
+R12
+R13
+Eload_mem
+Z23 w1708302870
+R2
+R3
+R4
+!i122 29
+R0
+Z24 8C:/Users/ryanm/Documents/Diamond/ws2812_driver/load_mem.vhd
+Z25 FC:/Users/ryanm/Documents/Diamond/ws2812_driver/load_mem.vhd
+l0
+L5 1
+V]^a<1D8JS3L`7f7n>:zZE2
+!s100 zJOdBXGnInW0YP2Q@bT1f1
+R7
+32
+Z26 !s110 1708302879
+!i10b 1
+Z27 !s108 1708302879.000000
+Z28 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/ryanm/Documents/Diamond/ws2812_driver/load_mem.vhd|
+Z29 !s107 C:/Users/ryanm/Documents/Diamond/ws2812_driver/load_mem.vhd|
+!i113 1
+R12
+R13
+Aarch
+R2
+R3
+R4
+Z30 DEx4 work 8 load_mem 0 22 ]^a<1D8JS3L`7f7n>:zZE2
+!i122 29
+l27
+L22 81
+VS2Q_;;mQIT3FN1@m`3L2X0
+!s100 9kU@33enRMVE=bJHf`bTE1
+R7
+32
+R26
+!i10b 1
+R27
+R28
+R29
+!i113 1
+R12
+R13
+Eload_mem_tb
+Z31 w1708297244
+R2
+R3
+R4
+!i122 20
+R0
+Z32 8C:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench_load_mem.vhd
+Z33 FC:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench_load_mem.vhd
+l0
+L220 1
+VQCH8L;:Xkc=T?iDRj`k`J3
+!s100 5mh47C0D[cSK>GJD[jSBW2
+R7
+32
+Z34 !s110 1708297257
+!i10b 1
+Z35 !s108 1708297257.000000
+Z36 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench_load_mem.vhd|
+Z37 !s107 C:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench_load_mem.vhd|
+!i113 1
+R12
+R13
+Atest
+Z38 DEx4 work 10 spi_master 0 22 RMl4:[@CG<l]f9mFH5OMb0
+Z39 DPx4 ieee 18 std_logic_unsigned 0 22 o4hn5gYc0WVo72BSL@Ta50
+R17
+Z40 DEx4 work 9 spi_slave 0 22 2<[_:?oiD4>zAV^hjPCzz1
+R30
+R2
+R3
+R4
+DEx4 work 11 load_mem_tb 0 22 QCH8L;:Xkc=T?iDRj`k`J3
+!i122 20
+l245
+L223 76
+VN5N1AEU;k[iWR<QzVKNeS3
+!s100 b;9C0fU;W>69@e1bUn]1H3
+R7
+32
+R34
+!i10b 1
+R35
+R36
+R37
+!i113 1
+R12
+R13
+Espi_master
+R31
+R2
+R3
+R4
+!i122 20
+R0
+R32
+R33
+l0
+L8 1
+VRMl4:[@CG<l]f9mFH5OMb0
+!s100 Eh496=f:AOj1[o]gQEg>P0
+R7
+32
+R34
+!i10b 1
+R35
+R36
+R37
+!i113 1
+R12
+R13
+Aarch_spi_master
+R2
+R3
+R4
+R38
+!i122 20
+l167
+L17 194
+V]g4iB`mBL>m:AJ7`8NKQJ2
+!s100 m0W>7i^YZQjF`01gW4j;=1
+R7
+32
+R34
+!i10b 1
+R35
+R36
+R37
+!i113 1
+R12
+R13
+Espi_slave
+Z41 w1708295636
+R39
+R17
+R3
+R4
+!i122 18
+R0
+Z42 8C:/Users/ryanm/Documents/Diamond/ws2812_driver/simple_spi.vhd
+Z43 FC:/Users/ryanm/Documents/Diamond/ws2812_driver/simple_spi.vhd
+l0
+L47 1
+V2<[_:?oiD4>zAV^hjPCzz1
+!s100 I>nDX9=20lgc4N?]ZdSUc1
+R7
+32
+Z44 !s110 1708295644
+!i10b 1
+Z45 !s108 1708295644.000000
+Z46 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/ryanm/Documents/Diamond/ws2812_driver/simple_spi.vhd|
+Z47 !s107 C:/Users/ryanm/Documents/Diamond/ws2812_driver/simple_spi.vhd|
+!i113 1
+R12
+R13
+Aarch
+R39
+R17
+R3
+R4
+R40
+!i122 18
+l94
+L71 482
+VbVjfg0_ePNhZm:Z>mZMYY1
+!s100 [DLboUdNaVHhYAEzHgmeR2
+R7
+32
+R44
+!i10b 1
+R45
+R46
+R47
+!i113 1
+R12
+R13
+Cstructure_con
+eframe_buffer_0
+aStructure
+DPx7 machxo2 4 mem3 0 22 I0A05c2mV75Dk2^4]5zXT1
+DPx7 machxo2 6 global 0 22 BIV_CP3LEY?ncdnC[;]`60
+R39
+DPx4 ieee 16 vital_primitives 0 22 Y]H?Y_]z4@VoaWAGJ=36m1
+DEx7 machxo2 7 pdpw8kc 0 22 Jf9f[dDjG<;Jlg131^0Wl3
+DEx7 machxo2 3 vlo 0 22 n2l778kNT[mGCaI;8kYkA1
+DPx4 ieee 12 vital_timing 0 22 6STbz=m1W[80IE06h_el^0
+DEx7 machxo2 3 vhi 0 22 2i>;e?EDXjg<1foO02XQP2
+DAx4 work 14 frame_buffer_0 9 structure 22 ;nBkHj2C?1?7[MblA7GNf3
+R17
+R18
+R3
+R4
+R22
+!i122 8
+R16
+R0
+R19
+R20
+l0
+L236 1
+VkHCifX1T8N@O`JWUhF^3G0
+!s100 8f[cSh3]@6:jo<aFK>Wj;0
+R7
+32
+R21
+!i10b 1
+!i113 1
+R12
+R13
+Etop
+Z48 w1708288289
+R3
+R4
+!i122 9
+R0
+Z49 8C:/Users/ryanm/Documents/Diamond/ws2812_driver/main.vhd
+Z50 FC:/Users/ryanm/Documents/Diamond/ws2812_driver/main.vhd
+l0
+L4 1
+V0Q@O:`kAj1Y?i=0G7MiCZ3
+!s100 WknoG3[HfNcIT4iK3W[<?0
+R7
+32
+R21
+!i10b 1
+Z51 !s108 1708292575.000000
+Z52 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/ryanm/Documents/Diamond/ws2812_driver/main.vhd|
+Z53 !s107 C:/Users/ryanm/Documents/Diamond/ws2812_driver/main.vhd|
+!i113 1
+R12
+R13
+Aarch
+R3
+R4
+DEx4 work 3 top 0 22 0Q@O:`kAj1Y?i=0G7MiCZ3
+!i122 9
+l110
+L21 124
+V>QUc2lFf@OZKlI2``DBR?2
+!s100 ^jTIXL;BG2NDg;RW27YJK1
+R7
+32
+R21
+!i10b 1
+R51
+R52
+R53
+!i113 1
+R12
+R13
+Etop_tb
+w1708215006
+R2
+R3
+R4
+!i122 10
+R0
+8C:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench_top.vhd
+FC:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench_top.vhd
+l0
+L7 1
+VTBSm_^I7:n=@e;hf:bNN]1
+!s100 `@XEW4@V=TG2TgDR<eTzJ0
+R7
+32
+R21
+!i10b 1
+R51
+!s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench_top.vhd|
+!s107 C:/Users/ryanm/Documents/Diamond/ws2812_driver/testbench_top.vhd|
+!i113 1
+R12
+R13
+Ews2812
+Z54 w1708220550
+R17
+R39
+R2
+R3
+R4
+!i122 2
+R0
+Z55 8C:/Users/ryanm/Documents/Diamond/ws2812_driver/WS2812.vhd
+Z56 FC:/Users/ryanm/Documents/Diamond/ws2812_driver/WS2812.vhd
+l0
+L6 1
+Vfza7X[J[9MUIR=aDQ2Nhi1
+!s100 g4iNR^M00c@dnQJaHNT5z1
+R7
+32
+R14
+!i10b 1
+R15
+Z57 !s90 -reportprogress|300|-work|work|-2002|-explicit|-stats=none|C:/Users/ryanm/Documents/Diamond/ws2812_driver/WS2812.vhd|
+Z58 !s107 C:/Users/ryanm/Documents/Diamond/ws2812_driver/WS2812.vhd|
+!i113 1
+R12
+R13
+Aarch
+R17
+R39
+R2
+R3
+R4
+DEx4 work 6 ws2812 0 22 fza7X[J[9MUIR=aDQ2Nhi1
+!i122 2
+l39
+L22 91
+VD80`7V_`31N@VXkQ<`0WF3
+!s100 7lYdffAN1a9>B6EZQS2n52
+R7
+32
+R14
+!i10b 1
+R15
+R57
+R58
+!i113 1
+R12
+R13

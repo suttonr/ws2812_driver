@@ -7,6 +7,7 @@ entity WS2812 is
 	generic (
 		clock_frequency : integer := 48_000_000; -- Hertz
 		max_address : std_logic_vector(8 downto 0) := b"111111111"
+		-- max_address : std_logic_vector(8 downto 0) := b"010010000"
 		
 	);
 	port (
@@ -15,7 +16,7 @@ entity WS2812 is
 		PixelIn : in std_logic_vector(23 downto 0);
 		PixelAddress : out std_logic_vector(8 downto 0);
 		serial : out std_logic;
-		load_delay : inout std_logic
+		status : inout std_logic
 	);
 end entity WS2812;
 
@@ -58,6 +59,7 @@ begin
 					state := sending;
 				end if;
 			when sending =>
+				status <= '1';
 				if (bit_counter > 0) then
 					bit_counter := bit_counter - 1;
 					delay_counter := TH;
@@ -98,6 +100,7 @@ begin
 					state := sending;
 				end if;
 			when reset =>
+				status <= '0';
 				if (delay_counter > 0) then
 					serial <= '0';
 					delay_counter := delay_counter - 1;
