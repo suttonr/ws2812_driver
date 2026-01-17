@@ -180,28 +180,29 @@ initial: process begin
     
   wait for 2 us; 
   
+  -- Send RGB565 test data: 0E (command), 00 01 (address 1), FF FF (RGB565 white)
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "01110011",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
-  
+                       "00001110",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
+
   wait for 100 ns;
-  
+
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "01000011",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
-  
-  wait for 104 ns;
-  
+                       "00000000",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
+
+  wait for 100 ns;
+
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "00011001",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
-   
+                       "00000001",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
+
    wait for 100 ns;
-                       
+
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "01010101",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);                       
-   
+                       "11111111",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
+
    wait for 100 ns;
-                       
+
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "10101010",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);                       
+                       "11111111",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
                        
   wait for 100 ns;                     
   wait;
@@ -285,6 +286,22 @@ begin
 	  mosi_master => MOSI_SLAVE,
 	  miso_master => MISO_SLAVE
 	);
+
+  -- RGB565 test verification
+  verify_rgb565: process(clock)
+  begin
+    if rising_edge(clock) then
+      if WE /= x"000000" then
+        -- Check if RGB565 data was correctly converted to RGB888
+        -- RGB565 FFFF (R=31,G=63,B=31) should convert to F8FCF8 at address 1
+        if WA = "000000001" and WD = x"F8FCF8" then
+          report "RGB565 test PASSED: WD = F8FCF8" severity note;
+        elsif WA = "000000001" then
+          report "RGB565 test FAILED: expected F8FCF8" severity error;
+        end if;
+      end if;
+    end if;
+  end process verify_rgb565;
 	
   -- Generate the test stimulus
   stimulus:

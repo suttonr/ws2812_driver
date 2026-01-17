@@ -33,7 +33,9 @@ begin
 		variable delay_counter : integer := 0;
 		variable spi_byte_counter : integer := 0;
 		variable spi_byte_timeout : integer := SPI_TIMEOUT;
-		variable index : integer := 0;		
+		variable index : integer := 0;
+		variable command : std_logic_vector(7 downto 0) := x"00";
+		variable rgb565 : std_logic_vector(15 downto 0);
 		-- STARTUP PATTERN
 		variable p_array : pixel_array := (x"FF0000", x"00FF00", x"0000FF", -- Port1
 											x"FF0000", x"00FF00", x"0000FF", -- Port2
@@ -46,7 +48,7 @@ begin
 	begin
 		wait until rising_edge(clk);
 		case state is
-			-- [Addr:16][G:8][B:8][R:8]
+			-- 0F[Addr:16][G:8][B:8][R:8] or 0E[Addr:16][R:5][G:6][B:5]
 			-- ADDR: [PORT 15:9][PIXEL 8:0]
 			when load =>
 				delay_counter := WRD;
@@ -55,6 +57,7 @@ begin
 				if SPI_RX_ERR = '1' then
 					spi_byte_counter := 0;
 					spi_byte_timeout := SPI_TIMEOUT;
+					command := x"00";
 				elsif index < pixel_array'length-1 then
 					WrData <= p_array(index);
 					fb := index;
@@ -62,7 +65,8 @@ begin
 					SPI_CS <= '1';
 					state  := wr;
 				elsif ((SPI_RX_RDY = '1') and ( spi_byte_counter < 1 )) then
-					if SPI_DATA_OUT = x"0F" then
+					if SPI_DATA_OUT = x"0F" or SPI_DATA_OUT = x"0E" then
+					    command := SPI_DATA_OUT;
 					    spi_byte_counter := spi_byte_counter + 1;
 					    spi_byte_timeout := SPI_TIMEOUT;
 					end if;
@@ -73,6 +77,7 @@ begin
 					if fb > 23 then
 						spi_byte_counter := 0;
 						spi_byte_timeout := SPI_TIMEOUT;
+						command := x"00";
 					else
 						SPI_CS <= '1';
 						spi_byte_counter := spi_byte_counter + 1;
@@ -84,7 +89,19 @@ begin
 					spi_byte_counter := spi_byte_counter + 1;
 					spi_byte_timeout := SPI_TIMEOUT;
 				elsif (SPI_RX_RDY = '1') then
-					WrData(23-((spi_byte_counter-3)*8) downto  16-((spi_byte_counter-3)*8) ) <= SPI_DATA_OUT;
+					if command = x"0F" then
+						WrData(23-((spi_byte_counter-3)*8) downto  16-((spi_byte_counter-3)*8) ) <= SPI_DATA_OUT;
+					elsif command = x"0E" then
+						if spi_byte_counter = 3 then
+							rgb565(15 downto 8) := SPI_DATA_OUT;
+						elsif spi_byte_counter = 4 then
+							rgb565(7 downto 0) := SPI_DATA_OUT;
+							-- Convert RGB565 to RGB888
+							WrData(23 downto 16) <= rgb565(15 downto 11) & "000"; -- R: 5 bits to 8
+							WrData(15 downto 8) <= rgb565(10 downto 5) & "00"; -- G: 6 bits to 8
+							WrData(7 downto 0) <= rgb565(4 downto 0) & "000"; -- B: 5 bits to 8
+						end if;
+					end if;
 					SPI_CS <= '1';
 					spi_byte_counter := spi_byte_counter + 1;
 					spi_byte_timeout := SPI_TIMEOUT;
@@ -93,11 +110,12 @@ begin
 				elsif (spi_byte_counter > 0) then
 					spi_byte_counter := 0;
 					spi_byte_timeout := SPI_TIMEOUT;
+					command := x"00";
 				end if;
 				
 				-- if SPI_RST = '1' then
 				--    state := reset;
-				if spi_byte_counter > 5 then
+				if (command = x"0F" and spi_byte_counter > 5) or (command = x"0E" and spi_byte_counter > 4) then
 					debug <= not debug;
 					state  := wr;
 				end if;
@@ -116,6 +134,7 @@ begin
 				WrEnable <= (others => '0');
 				spi_byte_counter := 0;
 				spi_byte_timeout := SPI_TIMEOUT;
+				command := x"00";
 				if index < pixel_array'length-1 then
 					index := index + 1;
 				end if;
