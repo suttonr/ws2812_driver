@@ -227,7 +227,7 @@ architecture test of load_mem_tb is
   signal clock  : std_logic := '0';
   signal WD : std_logic_vector(23 downto 0);
   signal WA : std_logic_vector(8 downto 0);
-  signal WE : std_logic;
+  signal WE : std_logic_vector(23 downto 0);
   signal SPI_DATA_OUT  : std_logic_vector(7 downto 0);
   signal SPI_RX_RDY    : std_logic;
   signal SPI_RX_ERR    : std_logic;
@@ -258,6 +258,7 @@ begin
       SPI_RX_RDY => SPI_RX_RDY,
       SPI_RX_ERR => SPI_RX_ERR,
 	  SPI_CS => SPI_CS,
+	  SPI_RST => '0',
 	  debug => debug
     );
   spi_s: entity spi_slave(arch)
