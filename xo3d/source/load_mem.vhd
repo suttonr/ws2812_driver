@@ -21,6 +21,7 @@ entity load_mem is
 end entity load_mem;
 
 architecture arch of load_mem is
+	-- Write delay cycles; can be reduced to 1 for faster batch processing if memory allows
 	constant WRD : integer := 5;
 	constant SPI_TIMEOUT : integer := 4800;
 	type pixel_array is array(0 to 20) of std_logic_vector(23 downto 0);
@@ -50,7 +51,11 @@ begin
 			when load =>
 				delay_counter := WRD;
 				SPI_CS <= '0';
-				if index < pixel_array'length-1 then
+				-- Handle SPI errors by resetting counters
+				if SPI_RX_ERR = '1' then
+					spi_byte_counter := 0;
+					spi_byte_timeout := SPI_TIMEOUT;
+				elsif index < pixel_array'length-1 then
 					WrData <= p_array(index);
 					fb := index;
 					WrAddr <= std_logic_vector(to_unsigned(index, WrAddr'length));
@@ -65,9 +70,14 @@ begin
 				elsif ((SPI_RX_RDY = '1') and ( spi_byte_counter < 2 )) then
 					WrAddr(8) <= SPI_DATA_OUT(0);
 					fb := to_integer(unsigned(SPI_DATA_OUT(7 downto 1)));
-					SPI_CS <= '1';
-					spi_byte_counter := spi_byte_counter + 1;
-					spi_byte_timeout := SPI_TIMEOUT;
+					if fb > 23 then
+						spi_byte_counter := 0;
+						spi_byte_timeout := SPI_TIMEOUT;
+					else
+						SPI_CS <= '1';
+						spi_byte_counter := spi_byte_counter + 1;
+						spi_byte_timeout := SPI_TIMEOUT;
+					end if;
 				elsif ((SPI_RX_RDY = '1') and ( spi_byte_counter < 3 )) then
 					WrAddr(7 downto 0) <= SPI_DATA_OUT;
 					SPI_CS <= '1';
