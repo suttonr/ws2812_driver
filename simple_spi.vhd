@@ -41,8 +41,7 @@
 -- --------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;  -- Use standard IEEE library for arithmetic operations to improve portability and avoid deprecated packages
 
 entity spi_slave is
 	generic (DATA_LENGTH : integer:=8;
@@ -88,8 +87,8 @@ architecture arch of spi_slave is
   signal                     tx_done_flip1:std_logic;
   signal                     tx_done_flip2:std_logic;
   signal                     tx_done_flip3:std_logic;
-  signal                rx_data_cnt:std_logic_vector(5 downto 0) := "000000";                     
-  signal                tx_data_cnt:std_logic_vector(5 downto 0) := "000000";   
+  signal                rx_data_cnt: integer range 0 to DATA_LENGTH-1 := 0;  -- Changed to integer for proper arithmetic and to prevent overflow for larger DATA_LENGTH
+  signal                tx_data_cnt: integer range 0 to DATA_LENGTH-1 := 0;  -- Changed to integer for proper arithmetic and to prevent overflow for larger DATA_LENGTH
   
 	begin
 		
@@ -511,17 +510,7 @@ architecture arch of spi_slave is
      end if;
    end process;
           
-   process(CLK_I,RST_I) begin
-     if (RST_I='1') then 
-       reg_roe                      <= '0';  
-     elsif rising_edge(CLK_I) then
-      if (rx_done_flip2='1' and rx_done_flip3='0' and reg_rrdy='1') then 
-        reg_roe                      <= '1';   
-      elsif (WR_RD='1' and CSn='0') then
-        reg_roe                      <= '0';
-      end if;
-     end if;
-   end process;       
+   -- Removed duplicate RX_ERR process; the original handles RX_ERR correctly
    
     
    process(CLK_I,RST_I) begin

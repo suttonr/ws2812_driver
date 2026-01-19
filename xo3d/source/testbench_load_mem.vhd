@@ -18,7 +18,7 @@ architecture arch_spi_master of spi_master is
 	
 constant  CLOCK_PHASE:std_logic:='0';
 constant  CLOCK_POLARITY:std_logic:='0';
-constant  SHIFT_DIRECTION:std_logic:='0';
+constant  SHIFT_DIRECTION:std_logic:='1';
 constant  DATA_LENGTH:integer:= 8;		
 
 --signal  master_data_in:std_logic_vector(7 downto 0);
@@ -180,28 +180,29 @@ initial: process begin
     
   wait for 2 us; 
   
+  -- Send RGB565 test data: 0E (command), 00 01 (address 1), FF FF (RGB565 white)
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "01110011",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
-  
+                       "00001110",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
+
   wait for 100 ns;
-  
+
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "01000011",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
-  
-  wait for 104 ns;
-  
+                       "00000000",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
+
+  wait for 100 ns;
+
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "00011001",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
-   
+                       "00000001",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
+
    wait for 100 ns;
-                       
+
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "01010101",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);                       
-   
+                       "11111111",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
+
    wait for 100 ns;
-                       
+
   spi_master_operation(sclk_master_tmp,csn_master_tmp,mosi_master_tmp,miso_master,
-                       "10101010",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);                       
+                       "11111111",CLOCK_PHASE,CLOCK_POLARITY,SHIFT_DIRECTION,DATA_LENGTH);
                        
   wait for 100 ns;                     
   wait;
@@ -223,11 +224,43 @@ end entity load_mem_tb;
 architecture test of load_mem_tb is
   constant ClockFrequency : integer := 48e6; -- 48 MHz
   constant ClockPeriod    : time    := 1000 ms / ClockFrequency;
+
+  function slv4_xcha (inp: STD_LOGIC_VECTOR(3 downto 0)) return CHARACTER is
+  variable result: character;
+  begin
+    case inp is
+      when "0000" => result := '0';
+      when "0001" => result := '1';
+      when "0010" => result := '2';
+      when "0011" => result := '3';
+      when "0100" => result := '4';
+      when "0101" => result := '5';
+      when "0110" => result := '6';
+      when "0111" => result := '7';
+      when "1000" => result := '8';
+      when "1001" => result := '9';
+      when "1010" => result := 'a';
+      when "1011" => result := 'b';
+      when "1100" => result := 'c';
+      when "1101" => result := 'd';
+      when "1110" => result := 'e';
+      when "1111" => result := 'f';
+      when others => result := 'x';
+    end case;
+  return result;
+  end;
+
+  function slv8_xstr (inp: STD_LOGIC_VECTOR(7 downto 0)) return STRING is
+  variable result : string (1 to 2);
+  begin
+    result := slv4_xcha(inp(7 downto 4)) & slv4_xcha(inp(3 downto 0));
+    return result;
+  end;
   
   signal clock  : std_logic := '0';
   signal WD : std_logic_vector(23 downto 0);
   signal WA : std_logic_vector(8 downto 0);
-  signal WE : std_logic;
+  signal WE : std_logic_vector(23 downto 0);
   signal SPI_DATA_OUT  : std_logic_vector(7 downto 0);
   signal SPI_RX_RDY    : std_logic;
   signal SPI_RX_ERR    : std_logic;
@@ -258,11 +291,12 @@ begin
       SPI_RX_RDY => SPI_RX_RDY,
       SPI_RX_ERR => SPI_RX_ERR,
 	  SPI_CS => SPI_CS,
+	  SPI_RST => '0',
 	  debug => debug
     );
   spi_s: entity spi_slave(arch)
     port map (
-        CSn         => SPI_CS,
+        CSn         => '0',
         DATA_IN     => DATA_IN,
         WR_RD       => WR_RD,
         DATA_OUT    => SPI_DATA_OUT,
@@ -274,22 +308,50 @@ begin
         RST_I       => RST_I,
         MISO_SLAVE  => MISO_SLAVE,
         MOSI_SLAVE  => MOSI_SLAVE,
-        CSn_SLAVE   => CSn_SLAVE,
+        CSn_SLAVE   => CsN_SLAVE,
         SCLK_SLAVE  => SCLK_SLAVE
 	);
   spi_m: entity spi_master(arch_spi_master)
     port map (
 	  sclk_master => SCLK_SLAVE,
-	  csn_master  => CSn_SLAVE,
+	  csn_master  => CsN_SLAVE,
 	  mosi_master => MOSI_SLAVE,
 	  miso_master => MISO_SLAVE
 	);
+
+  -- RGB565 test verification
+  verify_rgb565: process(clock)
+  begin
+    if rising_edge(clock) then
+      if WE /= x"000000" then
+        -- Check if RGB565 data was correctly converted to RGB888
+        -- RGB565 FFFF (R=31,G=63,B=31) should convert to FCF8F8 at address 1 (GRB order)
+        if WA = "000000001" then
+          if WD = x"FCF8F8" then
+            report "RGB565 test PASSED: WD = FCF8F8" severity note;
+          else
+            report "RGB565 test FAILED: WD = " & slv8_xstr(WD(23 downto 16)) & slv8_xstr(WD(15 downto 8)) & slv8_xstr(WD(7 downto 0)) & ", expected FCF8F8" severity error;
+          end if;
+        end if;
+      end if;
+    end if;
+  end process verify_rgb565;
+
+  -- Debug SPI
+  debug_spi: process(SPI_RX_RDY)
+  begin
+    if rising_edge(SPI_RX_RDY) then
+      report "SPI_RX_RDY high, SPI_DATA_OUT = " & slv8_xstr(SPI_DATA_OUT) severity note;
+    end if;
+  end process debug_spi;
 	
   -- Generate the test stimulus
   stimulus:
   process begin
-    RST_I <= '0';
+    RST_I <= '1';
 	WR_RD <= '1';
+	wait for 10 ns;
+	RST_I <= '0';
 	
     wait for 200 ns;
     -- Testing complete

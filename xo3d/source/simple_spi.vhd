@@ -41,8 +41,7 @@
 -- --------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
-use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 
 entity spi_slave is
 	generic (DATA_LENGTH : integer:=8;
@@ -51,9 +50,9 @@ entity spi_slave is
 	         CLOCK_PHASE:std_logic:='0');
   port (
         CSn       : in  std_logic;
-        DATA_IN   : in  std_logic_vector(7 downto 0);
+        DATA_IN   : in  std_logic_vector(DATA_LENGTH-1 downto 0);
         WR_RD     : in  std_logic;
-        DATA_OUT  : out  std_logic_vector(7 downto 0);	
+        DATA_OUT  : out  std_logic_vector(DATA_LENGTH-1 downto 0);
         TX_RDY     : out  std_logic;						
         RX_RDY     : out  std_logic;
         TX_ERR      : out std_logic;						
@@ -70,7 +69,7 @@ end;
 
 architecture arch of spi_slave is
 	constant UDLY:time:=1 ns;
-  signal    latch_s_data:std_logic_vector(7 downto 0);		
+  signal    latch_s_data:std_logic_vector(DATA_LENGTH-1 downto 0);
   signal    reg_rxdata:std_logic_vector(DATA_LENGTH-1 downto 0);
   signal    reg_txdata:std_logic_vector(DATA_LENGTH-1 downto 0);
   signal    rx_shift_data:std_logic_vector(DATA_LENGTH-1 downto 0);
@@ -149,25 +148,25 @@ architecture arch of spi_slave is
           end process;  
         
           process(SCLK_SLAVE ,RST_I) begin
-            if (RST_I='1') then 
-               rx_data_cnt     <= (others => '0'); 
+            if (RST_I='1') then
+               rx_data_cnt     <= (others => '0');
             elsif rising_edge(SCLK_SLAVE) then
-              if (rx_data_cnt = DATA_LENGTH - 1) then
+              if (to_integer(unsigned(rx_data_cnt)) = DATA_LENGTH - 1) then
                 rx_data_cnt     <=(others => '0');
               elsif (CSn_SLAVE='0') then
-               rx_data_cnt     <=rx_data_cnt + 1;
+               rx_data_cnt     <= std_logic_vector(unsigned(rx_data_cnt) + 1);
               end if;
             end if;
           end process;
         
           process(SCLK_SLAVE ,RST_I) begin
-            if (RST_I='1') then 
-               rx_done         <= '0'; 
+            if (RST_I='1') then
+               rx_done         <= '0';
             elsif rising_edge(SCLK_SLAVE) then
-              if (rx_data_cnt = DATA_LENGTH - 1) then
-                rx_done         <= '1'; 
+              if (to_integer(unsigned(rx_data_cnt)) = DATA_LENGTH - 1) then
+                rx_done         <= '1';
               else
-                rx_done         <= '0'; 
+                rx_done         <= '0';
               end if;
             end if;
           end process;
@@ -190,25 +189,25 @@ architecture arch of spi_slave is
            end process;  
          
             process(SCLK_SLAVE ,RST_I) begin
-             if (RST_I='1') then 
-                rx_data_cnt     <= (others => '0'); 
+             if (RST_I='1') then
+                rx_data_cnt     <= (others => '0');
              elsif falling_edge(SCLK_SLAVE) then
-               if (rx_data_cnt = DATA_LENGTH - 1) then 
+               if (to_integer(unsigned(rx_data_cnt)) = DATA_LENGTH - 1) then
                  rx_data_cnt     <=(others => '0');
                elsif (CSn_SLAVE='0') then
-                rx_data_cnt     <=rx_data_cnt + 1;
+                rx_data_cnt     <= std_logic_vector(unsigned(rx_data_cnt) + 1);
                end if;
              end if;
            end process;
-         
+
            process(SCLK_SLAVE ,RST_I) begin
-             if (RST_I='1') then 
-                rx_done         <= '0'; 
+             if (RST_I='1') then
+                rx_done         <= '0';
              elsif falling_edge(SCLK_SLAVE) then
-               if (rx_data_cnt = DATA_LENGTH - 1) then
-                 rx_done         <= '1'; 
+               if (to_integer(unsigned(rx_data_cnt)) = DATA_LENGTH - 1) then
+                 rx_done         <= '1';
                else
-                 rx_done         <= '0'; 
+                 rx_done         <= '0';
                end if;
              end if;
            end process;
@@ -231,25 +230,25 @@ architecture arch of spi_slave is
            end process;  
          
             process(SCLK_SLAVE ,RST_I) begin
-             if (RST_I='1') then 
-                rx_data_cnt     <= (others => '0'); 
+             if (RST_I='1') then
+                rx_data_cnt     <= (others => '0');
              elsif falling_edge(SCLK_SLAVE) then
-               if (rx_data_cnt = DATA_LENGTH - 1) then
+               if (to_integer(unsigned(rx_data_cnt)) = DATA_LENGTH - 1) then
                  rx_data_cnt     <=(others => '0');
                elsif (CSn_SLAVE='0') then
-                rx_data_cnt     <=rx_data_cnt + 1;
+                rx_data_cnt     <= std_logic_vector(unsigned(rx_data_cnt) + 1);
                end if;
              end if;
            end process;
-         
+
            process(SCLK_SLAVE ,RST_I) begin
-             if (RST_I='1') then 
-                rx_done         <= '0'; 
+             if (RST_I='1') then
+                rx_done         <= '0';
              elsif falling_edge(SCLK_SLAVE) then
-               if (rx_data_cnt = DATA_LENGTH - 1) then
-                 rx_done         <= '1'; 
+               if (to_integer(unsigned(rx_data_cnt)) = DATA_LENGTH - 1) then
+                 rx_done         <= '1';
                else
-                 rx_done         <= '0'; 
+                 rx_done         <= '0';
                end if;
              end if;
            end process;
@@ -273,25 +272,25 @@ architecture arch of spi_slave is
            end process;  
          
            process(SCLK_SLAVE ,RST_I) begin
-             if (RST_I='1') then 
-                rx_data_cnt     <= (others => '0'); 
+             if (RST_I='1') then
+                rx_data_cnt     <= (others => '0');
              elsif rising_edge(SCLK_SLAVE) then
-               if (rx_data_cnt = DATA_LENGTH - 1) then
+               if (to_integer(unsigned(rx_data_cnt)) = DATA_LENGTH - 1) then
                  rx_data_cnt     <=(others => '0');
                elsif (CSn_SLAVE='0') then
-                rx_data_cnt     <=rx_data_cnt + 1;
+                rx_data_cnt     <= std_logic_vector(unsigned(rx_data_cnt) + 1);
                end if;
              end if;
            end process;
-         
+
            process(SCLK_SLAVE ,RST_I) begin
-             if (RST_I='1') then 
-                rx_done         <= '0'; 
+             if (RST_I='1') then
+                rx_done         <= '0';
              elsif rising_edge(SCLK_SLAVE) then
-               if (rx_data_cnt = DATA_LENGTH - 1) then
-                 rx_done         <= '1'; 
+               if (to_integer(unsigned(rx_data_cnt)) = DATA_LENGTH - 1) then
+                 rx_done         <= '1';
                else
-                 rx_done         <= '0'; 
+                 rx_done         <= '0';
                end if;
              end if;
            end process;
@@ -341,34 +340,34 @@ architecture arch of spi_slave is
              process(reg_txdata,tx_data_cnt,CSn_SLAVE ) begin
                if (CSn_SLAVE='0') then
                	 if(SHIFT_DIRECTION='1') then
-                    MISO_SLAVE   <= reg_txdata(conv_integer(tx_data_cnt));
+                    MISO_SLAVE   <= reg_txdata(to_integer(unsigned(tx_data_cnt)));
                  else
-                    MISO_SLAVE   <= reg_txdata(conv_integer(DATA_LENGTH-tx_data_cnt-1));
-                 end if;                                
+                    MISO_SLAVE   <= reg_txdata(DATA_LENGTH - to_integer(unsigned(tx_data_cnt)) - 1);
+                 end if;
                else
                  MISO_SLAVE<='Z';
                end if;
              end process;
              
              process(SCLK_SLAVE ,RST_I) begin
-               if (RST_I='1') then 
-                  tx_data_cnt     <= (others => '0'); 
+               if (RST_I='1') then
+                  tx_data_cnt     <= (others => '0');
                elsif falling_edge(SCLK_SLAVE) then
-                 if (tx_data_cnt = DATA_LENGTH - 1) then
+                 if (to_integer(unsigned(tx_data_cnt)) = DATA_LENGTH - 1) then
                    tx_data_cnt     <= (others => '0');
                  elsif (CSn_SLAVE='0') then
-                  tx_data_cnt     <= tx_data_cnt + 1;
+                  tx_data_cnt     <= std_logic_vector(unsigned(tx_data_cnt) + 1);
                  end if;
                end if;
              end process;
-                  
+
              process(SCLK_SLAVE ,RST_I) begin
-               if (RST_I='1') then 
-                  tx_done     <='0'; 
+               if (RST_I='1') then
+                  tx_done     <='0';
                elsif falling_edge(SCLK_SLAVE) then
-                 if (tx_data_cnt = DATA_LENGTH - 1) then
+                 if (to_integer(unsigned(tx_data_cnt)) = DATA_LENGTH - 1) then
                   tx_done     <= '1';
-                 else 
+                 else
                   tx_done     <= '0';
                  end if;
                end if;
@@ -378,42 +377,42 @@ architecture arch of spi_slave is
    u22:     if CLOCK_POLARITY='0' and CLOCK_PHASE='1' generate
                                                                      
              process (SCLK_SLAVE) begin
-               if rising_edge(CLK_I) then                      
+               if rising_edge(CLK_I) then
                  if (CSn_SLAVE='0') then
                  	 if(SHIFT_DIRECTION='1') then
-                      MISO_SLAVE   <= reg_txdata(conv_integer(tx_data_cnt));
-                   else        
-                      MISO_SLAVE   <= reg_txdata(conv_integer(DATA_LENGTH-tx_data_cnt-1));
+                      MISO_SLAVE   <= reg_txdata(to_integer(unsigned(tx_data_cnt)));
+                   else
+                      MISO_SLAVE   <= reg_txdata(DATA_LENGTH - to_integer(unsigned(tx_data_cnt)) - 1);
                    end if;
                  else
                    MISO_SLAVE<='Z';
                  end if;
               end if;
              end process;
-                                                                                   
+
              process(SCLK_SLAVE ,RST_I) begin
-               if (RST_I='1') then 
-                  tx_data_cnt     <= (others => '0'); 
+               if (RST_I='1') then
+                  tx_data_cnt     <= (others => '0');
                elsif rising_edge(SCLK_SLAVE) then
-                 if (tx_data_cnt = DATA_LENGTH - 1) then
+                 if (to_integer(unsigned(tx_data_cnt)) = DATA_LENGTH - 1) then
                    tx_data_cnt     <= (others => '0');
                  elsif (CSn_SLAVE='0') then
-                  tx_data_cnt     <=  tx_data_cnt + 1;
+                  tx_data_cnt     <= std_logic_vector(unsigned(tx_data_cnt) + 1);
                  end if;
                end if;
              end process;
-                  
+
              process(SCLK_SLAVE ,RST_I) begin
-               if (RST_I='1') then 
-                  tx_done     <= '0'; 
+               if (RST_I='1') then
+                  tx_done     <= '0';
                elsif rising_edge(SCLK_SLAVE) then
-                 if (tx_data_cnt = DATA_LENGTH - 1) then
+                 if (to_integer(unsigned(tx_data_cnt)) = DATA_LENGTH - 1) then
                   tx_done     <= '1';
-                 else 
+                 else
                   tx_done     <= '0';
                  end if;
                end if;
-             end process;  
+             end process;
      end generate;
            
    -------------------------------------update at posedge when CLOCK_POLARITY=1 and CLOCK_PHASE is 0        
@@ -421,34 +420,34 @@ architecture arch of spi_slave is
               process(reg_txdata,tx_data_cnt,CSn_SLAVE ) begin
                if (CSn_SLAVE='0') then
                	 if(SHIFT_DIRECTION='1') then
-                    MISO_SLAVE   <= reg_txdata(conv_integer(tx_data_cnt));
+                    MISO_SLAVE   <= reg_txdata(to_integer(unsigned(tx_data_cnt)));
                  else
-                    MISO_SLAVE   <= reg_txdata(conv_integer(DATA_LENGTH-tx_data_cnt-1));
-                 end if;                                
+                    MISO_SLAVE   <= reg_txdata(DATA_LENGTH - to_integer(unsigned(tx_data_cnt)) - 1);
+                 end if;
                else
                  MISO_SLAVE<='Z';
                end if;
              end process;
-                                                         
+
               process(SCLK_SLAVE ,RST_I) begin
-               if (RST_I='1') then 
-                  tx_data_cnt     <= (others => '0'); 
+               if (RST_I='1') then
+                  tx_data_cnt     <= (others => '0');
                elsif rising_edge(SCLK_SLAVE) then
-                 if (tx_data_cnt = DATA_LENGTH - 1) then
+                 if (to_integer(unsigned(tx_data_cnt)) = DATA_LENGTH - 1) then
                    tx_data_cnt     <= (others => '0');
                  elsif (CSn_SLAVE='0') then
-                  tx_data_cnt     <=  tx_data_cnt + 1;
+                  tx_data_cnt     <= std_logic_vector(unsigned(tx_data_cnt) + 1);
                  end if;
                end if;
              end process;
-                  
+
              process(SCLK_SLAVE ,RST_I) begin
-               if (RST_I='1') then 
-                  tx_done     <= '0'; 
+               if (RST_I='1') then
+                  tx_done     <= '0';
                elsif rising_edge(SCLK_SLAVE) then
-                 if (tx_data_cnt = DATA_LENGTH - 1) then
+                 if (to_integer(unsigned(tx_data_cnt)) = DATA_LENGTH - 1) then
                   tx_done     <= '1';
-                 else 
+                 else
                   tx_done     <= '0';
                  end if;
                end if;
@@ -459,43 +458,43 @@ architecture arch of spi_slave is
            -------------------------------------update at negedge when CLOCK_POLARITY=1 and CLOCK_PHASE is 1        
    u44:    if CLOCK_POLARITY='1' and CLOCK_PHASE='1' generate            
                                                          
-              process (SCLK_SLAVE) begin 
-               if falling_edge(CLK_I) then                      
+              process (SCLK_SLAVE) begin
+               if falling_edge(CLK_I) then
                  if (CSn_SLAVE='0') then
                  	 if(SHIFT_DIRECTION='1') then
-                      MISO_SLAVE   <= reg_txdata(conv_integer(tx_data_cnt));
-                   else        
-                      MISO_SLAVE   <= reg_txdata(conv_integer(DATA_LENGTH-tx_data_cnt-1));
+                      MISO_SLAVE   <= reg_txdata(to_integer(unsigned(tx_data_cnt)));
+                   else
+                      MISO_SLAVE   <= reg_txdata(DATA_LENGTH - to_integer(unsigned(tx_data_cnt)) - 1);
                    end if;
                  else
                    MISO_SLAVE<='Z';
                  end if;
               end if;
              end process;
-                 
+
              process(SCLK_SLAVE ,RST_I) begin
-               if (RST_I='1') then 
-                  tx_data_cnt     <= (others => '0'); 
+               if (RST_I='1') then
+                  tx_data_cnt     <= (others => '0');
                elsif falling_edge(SCLK_SLAVE) then
-                 if (tx_data_cnt = DATA_LENGTH - 1) then
+                 if (to_integer(unsigned(tx_data_cnt)) = DATA_LENGTH - 1) then
                    tx_data_cnt     <= (others => '0');
                  elsif (CSn_SLAVE='0') then
-                  tx_data_cnt     <= tx_data_cnt + 1;
+                  tx_data_cnt     <= std_logic_vector(unsigned(tx_data_cnt) + 1);
                  end if;
                end if;
              end process;
-                  
+
              process(SCLK_SLAVE ,RST_I) begin
-               if (RST_I='1') then 
-                  tx_done     <='0'; 
+               if (RST_I='1') then
+                  tx_done     <='0';
                elsif falling_edge(SCLK_SLAVE) then
-                 if (tx_data_cnt = DATA_LENGTH - 1) then
+                 if (to_integer(unsigned(tx_data_cnt)) = DATA_LENGTH - 1) then
                   tx_done     <= '1';
-                 else 
+                 else
                   tx_done     <= '0';
                  end if;
                end if;
-             end process; 
+             end process;
          
          end generate;
          
@@ -512,22 +511,9 @@ architecture arch of spi_slave is
    end process;
           
    process(CLK_I,RST_I) begin
-     if (RST_I='1') then 
-       reg_roe                      <= '0';  
-     elsif rising_edge(CLK_I) then
-      if (rx_done_flip2='1' and rx_done_flip3='0' and reg_rrdy='1') then 
-        reg_roe                      <= '1';   
-      elsif (WR_RD='1' and CSn='0') then
-        reg_roe                      <= '0';
-      end if;
-     end if;
-   end process;       
-   
-    
-   process(CLK_I,RST_I) begin
-     if (RST_I='1') then 
+     if (RST_I='1') then
         reg_trdy     <= '1';
-     elsif rising_edge(CLK_I) then   
+     elsif rising_edge(CLK_I) then
       if (WR_RD='0' and CSn='0') then
         reg_trdy     <= '0';
       elsif (tx_done_flip2='1' and tx_done_flip3='0') then
@@ -536,14 +522,14 @@ architecture arch of spi_slave is
      end if;
    end process;
 
- 
+
   process(CLK_I,RST_I) begin
-     if (RST_I='1') then 
+     if (RST_I='1') then
        reg_toe      <= '0';
      elsif rising_edge(CLK_I) then
       if(reg_trdy='0' and WR_RD='0' and CSn='0') then
        reg_toe      <= '1';
-      elsif(WR_RD='0' and CSn='0') then
+      elsif (tx_done_flip2='1' and tx_done_flip3='0') then
        reg_toe      <= '0';
       end if;
      end if;
