@@ -97,8 +97,8 @@ begin
 						elsif spi_byte_counter = 4 then
 							rgb565(7 downto 0) := SPI_DATA_OUT;
 							-- Convert RGB565 to RGB888
-							WrData(23 downto 16) <= rgb565(15 downto 11) & "000"; -- R: 5 bits to 8
-							WrData(15 downto 8) <= rgb565(10 downto 5) & "00"; -- G: 6 bits to 8
+							WrData(23 downto 16) <= rgb565(10 downto 5) & "00"; -- G: 6 bits to 8 
+							WrData(15 downto 8) <= rgb565(15 downto 11) & "000"; -- R: 5 bits to 8 
 							WrData(7 downto 0) <= rgb565(4 downto 0) & "000"; -- B: 5 bits to 8
 						end if;
 					end if;
