@@ -54,10 +54,6 @@ flowchart TD
     FPGA --> P0 & P1 & P2 & P3 & P4 & P5 & P18 & P19 & P20
 ```
 
-![image](doc/img/diagram.png)
-
-*Note: In current implementations, the Micropython controller shown in the legacy diagram above is replaced by a Raspberry Pi Zero 2W. The FPGA drives 21 independent strings (3 rows x 7 columns).*
-
 ## Communication Protocol
 
 The FPGA acts as an SPI Slave. Data is sent in 5-byte packets to update individual pixels.
