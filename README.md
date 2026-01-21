@@ -56,19 +56,43 @@ flowchart TD
 
 ## Communication Protocol
 
-The FPGA acts as an SPI Slave. Data is sent in 5-byte packets to update individual pixels.
+The FPGA acts as an SPI Slave. Data is sent in 6-byte packets to update individual pixels.
 
 ### SPI Packet Format
-![image](doc/img/SPI_PACKET.png)
 
-1. **Byte 0: Control/Port**
-   - Bits [7:1]: Frame Buffer / Port selection.
+```mermaid
+flowchart LR
+    subgraph Fields [6-Byte SPI Packet]
+        F0[Header: 0x0F]
+        F1["Port[7:1]<br/>Addr[0]"]
+        F2["Addr Bits [7:0]"]
+        F3["Green[7:0]"]
+        F4["Blue[7:0]"]
+        F5["Red[7:0]"]
+    end
+```
+```mermaid
+flowchart LR
+    subgraph Fields [5-Byte SPI Packet]
+        F0[Header: 0x0E]
+        F1["Port[7:1]<br/>Addr[0]"]
+        F2["Addr[7:0]"]
+        F3["Red[7:3] Green[2:0]"]
+        F4["Green[7:5] Blue[4:0]"]
+    end
+```
+
+
+1. **Byte 0: Header**
+   - Fixed value: `0x0F`
+2. **Byte 1: Control/Port**
+   - Bits [7:1]: Frame Buffer / Port selection (0-20).
    - Bit [0]: Most Significant Bit (MSB) of the Pixel Address (Bit 8).
-2. **Byte 1: Address**
+3. **Byte 2: Address**
    - Bits [7:0]: Lower 8 bits of the Pixel Address.
-3. **Byte 2: Green** (8-bit intensity)
-4. **Byte 3: Blue** (8-bit intensity)
-5. **Byte 4: Red** (8-bit intensity)
+4. **Byte 3: Green** (8-bit intensity)
+5. **Byte 4: Blue** (8-bit intensity)
+6. **Byte 5: Red** (8-bit intensity)
 
 *Note: The color order in the SPI packet is G-B-R to match the internal WS2812 transmission order.*
 
