@@ -98,4 +98,4 @@ flowchart LR
 
 ## Interaction with py_marquee
 
-This driver is designed to work with the [py_marquee](../py_marquee) Python library. The library handles the high-level matrix logic, font rendering, and animations, sending raw pixel updates to the FPGA over the SPI bus.
+This driver is designed to work with the [py_marquee](https://github.com/suttonr/py_marquee) Python library. The library handles the high-level matrix logic, font rendering, and animations, sending raw pixel updates to the FPGA over the SPI bus.
